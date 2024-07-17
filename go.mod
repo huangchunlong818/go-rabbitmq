@@ -28,6 +28,8 @@ replace go.opentelemetry.io/contrib/instrumentation/host v0.53.0 => go.opentelem
 
 replace go.opentelemetry.io/contrib/instrumentation/runtime v0.53.0 => go.opentelemetry.io/contrib/instrumentation/runtime v0.46.1
 
+replace google.golang.org/grpc v1.65.0 => google.golang.org/grpc v1.63.2
+
 require (
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/huangchunlong818/go-trace v0.1.1

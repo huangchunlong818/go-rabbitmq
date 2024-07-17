@@ -7,7 +7,7 @@ go get github.com/huangchunlong818/go-rabbitmq
 go get -u github.com/huangchunlong818/go-rabbitmq
 
 指定版本
-go get -u github.com/huangchunlong818/go-rabbitmq@v0.1.3
+go get -u github.com/huangchunlong818/go-rabbitmq@v0.1.5
 
 开发的go版本 1.20.5
 
