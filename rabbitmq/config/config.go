@@ -6,43 +6,9 @@ import (
 )
 
 type RabbitmqConfig struct {
-	Rabbitmq []RabbitmqConsume
+	Rabbitmq map[string]RabbitmqConsume
 	Trace    TraceConfig
 	Source   string
-}
-
-var newRabbitmqConfig *RabbitmqConfig
-
-func GetNewConfig(options ...Option) *RabbitmqConfig {
-	if newRabbitmqConfig == nil {
-		newRabbitmqConfig = &RabbitmqConfig{}
-	}
-
-	for _, option := range options {
-		option(newRabbitmqConfig)
-	}
-
-	return newRabbitmqConfig
-}
-
-type Option func(*RabbitmqConfig)
-
-func WithTrace(t TraceConfig) Option {
-	return func(config *RabbitmqConfig) {
-		config.Trace = t
-	}
-}
-
-func WithSource(t string) Option {
-	return func(config *RabbitmqConfig) {
-		config.Source = t
-	}
-}
-
-func WithRabbitmq(t []RabbitmqConsume) Option {
-	return func(config *RabbitmqConfig) {
-		config.Rabbitmq = t
-	}
 }
 
 // trace配置
