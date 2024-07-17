@@ -38,7 +38,7 @@ func (r *RabbitmqInit) InitRabbitMq() error {
 }
 
 // 启动
-func (r *RabbitmqInit) Strat(ctx context.Context) error {
+func (r *RabbitmqInit) Start(ctx context.Context) error {
 	rbConfig := r.GetRabbitmqConfig()
 	if len(rbConfig) < 1 {
 		return errors.New("没有定义任何rabbitmq 队列")

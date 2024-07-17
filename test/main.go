@@ -56,7 +56,10 @@ func main() {
 	}
 
 	//消费服务
-	mq.Strat(ctx)
+	mq.Start(ctx)
+
+	//停止消费服务
+	mq.Stop(ctx)
 
 	fmt.Println("Hello World", ctx, mq)
 }
