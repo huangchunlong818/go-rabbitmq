@@ -24,9 +24,7 @@ var errorHandler Errors = &defaultError{}
 
 // SetErrorHandler 设置自定义的错误处理器
 func SetErrorHandler(e Errors) {
-	if e != nil {
-		errorHandler = e
-	}
+	errorHandler = e
 }
 
 // HandleError 调用当前的错误处理器处理错误

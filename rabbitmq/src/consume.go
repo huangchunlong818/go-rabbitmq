@@ -252,9 +252,9 @@ func (c *RabmqConnPool) startConsumeWithConn(ctx context.Context, connWrapper *m
 	// 消费消息
 	for d := range messages {
 		//获取当前队列最大的消费次数
-		var retryCount uint
-		if num == 0 {
-			retryCount = 1 //默认只消费一次
+		retryCount := 1
+		if num > 0 {
+			retryCount = num //默认只消费一次
 		}
 
 		// 使用 retry.Do 封装处理逻辑
@@ -262,8 +262,8 @@ func (c *RabmqConnPool) startConsumeWithConn(ctx context.Context, connWrapper *m
 			func() error {
 				return handler(d.Body)
 			},
-			retry.Attempts(retryCount), // 总共执行几次
-			retry.Delay(timeInterval),  // 重试间隔
+			retry.Attempts(uint(retryCount)), // 总共执行几次
+			retry.Delay(timeInterval),        // 重试间隔
 			retry.OnRetry(func(n uint, err error) {
 				errorx.ErrorPush("消费消息失败：queueName=" + args.queueName + ",msg=" + string(d.Body) + "，error：" + err.Error() + "，当前消费次数：" + strconv.Itoa(int(n+1)))
 			}),
