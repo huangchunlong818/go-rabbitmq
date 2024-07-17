@@ -30,6 +30,8 @@ replace go.opentelemetry.io/contrib/instrumentation/runtime v0.53.0 => go.opente
 
 replace google.golang.org/grpc v1.65.0 => google.golang.org/grpc v1.63.2
 
+replace github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0 => github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.1
+
 require (
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/huangchunlong818/go-trace v0.1.1
