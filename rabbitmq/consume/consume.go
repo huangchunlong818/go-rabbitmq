@@ -64,7 +64,7 @@ func (c *MqConsumeServer) registerConsumeDirectHandler(operation string, exchang
 			defer func() {
 				err := recover()
 				if err != nil {
-					errorx.ErrorPush("队列1：" + queueName + " ,operation:" + operation + "，错误信息：" + fmt.Errorf("%+v", err).Error())
+					errorx.ErrorPush("队列：" + queueName + " ,operation:" + operation + "，错误信息：" + fmt.Errorf("%+v", err).Error())
 				}
 			}()
 			global.RabbitMq.ConsumeDirect(exchangeName, queueName, routingKey, func(data []byte) error {
@@ -76,6 +76,13 @@ func (c *MqConsumeServer) registerConsumeDirectHandler(operation string, exchang
 
 // consumeHandle 带链路跟踪处理
 func (c *MqConsumeServer) consumeHandle(operation string, data []byte, handler config.Consumefunc) error {
+	defer func() {
+		err := recover()
+		if err != nil {
+			errorx.ErrorPush("队列operation:" + operation + "，错误信息：" + fmt.Errorf("%+v", err).Error())
+		}
+	}()
+
 	if c.checkClosed() {
 		return errors.New("------closed-----")
 	}
