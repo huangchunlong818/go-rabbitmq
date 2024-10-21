@@ -127,6 +127,9 @@ func (c *RabmqConnPool) getConnWrapper(ctx context.Context) (*mqConnWrapper, err
 
 	var res *mqConnWrapper
 	for _, cw := range c.conns {
+		if cw == nil {
+			continue // 跳过nil值
+		}
 		if cw.checkClosed() {
 			continue
 		}
