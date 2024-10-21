@@ -127,6 +127,10 @@ func (c *RabmqConnPool) getConnWrapper(ctx context.Context) (*mqConnWrapper, err
 
 	var res *mqConnWrapper
 	for _, cw := range c.conns {
+		if cw == nil {
+			// 如果 cw 是 nil, 直接跳过
+			continue
+		}
 		if cw.checkClosed() {
 			continue
 		}
@@ -162,19 +166,45 @@ func (c *RabmqConnPool) monitor() {
 		// 删除已断开的连接
 		for i, cw := range c.conns {
 			if cw.index == index {
-				c.conns = append(c.conns[:i], c.conns[i+1:]...)
+				//c.conns = append(c.conns[:i], c.conns[i+1:]...)
+				// 标记为 nil 不立即删除，确保其他 goroutine 不会发生错误  上面注释的是直接删除，可能会造成nil连接
+				c.conns[i] = nil
 				break
 			}
 		}
-		// 如果连接池中的连接数小于最大连接数，则创建新的连接
-		if len(c.conns) >= c.maxIdleConns {
-			continue
+
+		// 清理 nil 元素 新增清理 nil连接
+		c.conns = c.filterNilConnections(c.conns)
+
+		// 如果连接池中的连接数小于最大连接数，则创建新的连接  改成这种简洁的代码方式
+		if len(c.conns) < c.maxIdleConns {
+			connWrap, err := c.newConnWrapper()
+			if err == nil {
+				c.conns = append(c.conns, connWrap)
+			} else {
+				errorx.ErrorPush("创建新的AMQP连接失败：" + err.Error())
+			}
 		}
-		connWrap, err := c.newConnWrapper()
-		if err != nil {
-			errorx.ErrorPush("创建新的AMQP连接失败：" + err.Error())
-		}
-		c.conns = append(c.conns, connWrap)
+		//if len(c.conns) >= c.maxIdleConns {
+		//	continue
+		//}
+		//connWrap, err := c.newConnWrapper()
+		//if err != nil {
+		//	errorx.ErrorPush("创建新的AMQP连接失败：" + err.Error())
+		//}
+		//c.conns = append(c.conns, connWrap)
+
 		c.mu.Unlock()
 	}
+}
+
+// filterNilConnections 用于移除 nil 连接
+func (c *RabmqConnPool) filterNilConnections(conns []*mqConnWrapper) []*mqConnWrapper {
+	result := make([]*mqConnWrapper, 0, len(conns))
+	for _, conn := range conns {
+		if conn != nil {
+			result = append(result, conn)
+		}
+	}
+	return result
 }
