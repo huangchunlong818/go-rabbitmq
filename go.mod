@@ -7,7 +7,7 @@ require (
 	github.com/huangchunlong818/go-trace v0.1.1
 	github.com/rs/xid v1.5.0
 	github.com/streadway/amqp v1.1.0
-	go.opentelemetry.io/otel/trace v1.24.0
+	go.opentelemetry.io/otel/trace v1.28.0
 )
 
 require (
@@ -45,33 +45,3 @@ require (
 	google.golang.org/grpc v1.63.2 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 )
-
-replace go.opentelemetry.io/otel => go.opentelemetry.io/otel v1.24.0
-
-replace go.opentelemetry.io/otel/trace => go.opentelemetry.io/otel/trace v1.24.0
-
-replace go.opentelemetry.io/otel/sdk => go.opentelemetry.io/otel/sdk v1.24.0
-
-replace go.opentelemetry.io/otel/exporters/otlp/otlptrace => go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.21.0
-
-replace go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc => go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.21.0
-
-replace go.opentelemetry.io/otel/exporters/stdout/stdouttrace => go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.21.0
-
-replace go.opentelemetry.io/otel/sdk/metric => go.opentelemetry.io/otel/sdk/metric v1.24.0
-
-replace go.opentelemetry.io/otel/metric => go.opentelemetry.io/otel/metric v1.24.0
-
-replace go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc => go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v0.44.0
-
-replace go.opentelemetry.io/otel/exporters/stdout/stdoutmetric => go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v0.44.0
-
-replace go.opentelemetry.io/proto/otlp => go.opentelemetry.io/proto/otlp v1.0.0
-
-replace go.opentelemetry.io/contrib/instrumentation/host => go.opentelemetry.io/contrib/instrumentation/host v0.46.1
-
-replace go.opentelemetry.io/contrib/instrumentation/runtime => go.opentelemetry.io/contrib/instrumentation/runtime v0.46.1
-
-replace google.golang.org/grpc => google.golang.org/grpc v1.63.2
-
-replace github.com/grpc-ecosystem/grpc-gateway/v2 => github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.1
