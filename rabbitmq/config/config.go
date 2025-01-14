@@ -35,6 +35,7 @@ type RabbitmqConsume struct {
 	//消费多次的情况下，每次消费时间间隔，默认30秒，这是阻塞消费协程的，谨慎配置，
 	Num          int           //消费次数，最低是1次哦，不配置或者配置0 ，默认1
 	TimeInterval time.Duration //消费多次的情况下，每次消费时间间隔，默认30秒
+	Type         string        //类型， delay 延迟队列，direct 直接队列普通队列,目前只支持这2种，如果没定义，默认都是 direct
 }
 
 // consumefunc 数据处理

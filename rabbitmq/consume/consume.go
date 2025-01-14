@@ -37,9 +37,9 @@ func NewMqConsumeServer(traceConfig config.TraceConfig) *MqConsumeServer {
 // Start 启动服务
 func (c *MqConsumeServer) Start(ctx context.Context, configs []config.RabbitmqConsume) error {
 
-	//目前暂时只扩展了 Direct 交换器
+	//目前扩展了 Direct 和延迟队列 交换器
 	for _, conf := range configs {
-		c.registerConsumeDirectHandler(conf.Operation, conf.Exchange, conf.Queue, conf.QueueRouterKey, conf.Handler, conf.ConsumerNum, conf.Num, conf.TimeInterval)
+		c.registerConsumeHandler(conf.Type, conf.Operation, conf.Exchange, conf.Queue, conf.QueueRouterKey, conf.Handler, conf.ConsumerNum, conf.Num, conf.TimeInterval)
 	}
 
 	return nil
@@ -56,8 +56,8 @@ func (c *MqConsumeServer) checkClosed() bool {
 	return atomic.LoadUint32(&c.isClosed) == MQ_SERVER_STATUS_CLOSED
 }
 
-// registerConsumeDirectHandler direct消费处理
-func (c *MqConsumeServer) registerConsumeDirectHandler(operation string, exchangeName, queueName, routingKey string, handler config.Consumefunc, consumerNum int, num int, timeInterval time.Duration, ops ...rabbitmqsrc.ConsumeOption) {
+// 消费处理
+func (c *MqConsumeServer) registerConsumeHandler(types string, operation string, exchangeName, queueName, routingKey string, handler config.Consumefunc, consumerNum int, num int, timeInterval time.Duration, ops ...rabbitmqsrc.ConsumeOption) {
 	for i := 0; i < consumerNum; i++ {
 		//根据配置的消费协程数量，开启多少个协程 去消费
 		go func() {
@@ -67,9 +67,18 @@ func (c *MqConsumeServer) registerConsumeDirectHandler(operation string, exchang
 					errorx.ErrorPush("队列：" + queueName + " ,operation:" + operation + "，错误信息：" + fmt.Errorf("%+v", err).Error())
 				}
 			}()
-			global.RabbitMq.ConsumeDirect(exchangeName, queueName, routingKey, func(data []byte) error {
-				return c.consumeHandle(operation, data, handler)
-			}, num, timeInterval, ops...)
+			switch types {
+			//延迟队列
+			case "delay":
+				global.RabbitMq.ConsumeDelayed(exchangeName, queueName, routingKey, func(data []byte) error {
+					return c.consumeHandle(operation, data, handler)
+				}, num, timeInterval, ops...)
+			//普通队列
+			default:
+				global.RabbitMq.ConsumeDirect(exchangeName, queueName, routingKey, func(data []byte) error {
+					return c.consumeHandle(operation, data, handler)
+				}, num, timeInterval, ops...)
+			}
 		}()
 	}
 }
