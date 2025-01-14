@@ -188,7 +188,12 @@ func (c *RabmqConnPool) ConsumeDirect(exchangeName, queueName, routingKey string
 	c.consumeWithExchangeType(exchangeName, "direct", queueName, routingKey, handler, num, timeInterval, ops...)
 }
 
-// ConsumeDirect 启动Direct消费者
+// ConsumeDelayed 启动延迟队列消费者
+func (c *RabmqConnPool) ConsumeDelayed(exchangeName, queueName, routingKey string, handler dataHandleFunc, num int, timeInterval time.Duration, ops ...ConsumeOption) {
+	c.consumeWithExchangeType(exchangeName, "x-delayed-message", queueName, routingKey, handler, num, timeInterval, ops...)
+}
+
+// 设置消费者类型
 func (c *RabmqConnPool) consumeWithExchangeType(exchangeName, exchangeType, queueName, routingKey string, handler dataHandleFunc, num int, timeInterval time.Duration, ops ...ConsumeOption) {
 	ctx := context.Background()
 	consu := defaultConsumeArgs
