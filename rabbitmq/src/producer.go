@@ -23,12 +23,20 @@ type producerArgs struct {
 	publishImmediate    bool  // 路由失败时处理方法
 	publishDeliveryMode uint8 // 消息传递失败后是否重试投递
 	publishPriority     uint8 // 消息优先级
+	delay               int   // 消息延迟时间（单位：毫秒） **新增延迟选项**
 	// 以下参数不默认
 	exchangeName string // 交换机名称
 	routingKey   string // 路由键
 }
 
 type ProducerOption func(*producerArgs)
+
+// WithProducerDelay 设置消息延迟 // **新增延迟选项**
+func WithProducerDelay(delay int) ProducerOption {
+	return func(args *producerArgs) {
+		args.delay = delay
+	}
+}
 
 // WithProducerIsConfirm 设置确认模式
 func WithProducerIsConfirm(isConfirm bool) ProducerOption {
@@ -80,6 +88,12 @@ func (c *RabmqConnPool) ProducerFanout(ctx context.Context, exchangeName string,
 	return c.producerPublish(ctx, exchangeName, "", data, ops...)
 }
 
+// ProducerDelay  Delay延迟消息生产 delay 毫秒  5000 就是5秒
+func (c *RabmqConnPool) ProducerDelay(ctx context.Context, exchangeName, routingKey string, data []byte, delay int, ops ...ProducerOption) error {
+	ops = append(ops, WithProducerDelay(delay))
+	return c.producerPublish(ctx, exchangeName, routingKey, data, ops...)
+}
+
 // producerPublish 生产者发送消息
 func (c *RabmqConnPool) producerPublish(ctx context.Context, exchangeName, routingKey string, data []byte, ops ...ProducerOption) error {
 	args := defaultProducerArgs
@@ -113,7 +127,17 @@ func (c *RabmqConnPool) producerPublish(ctx context.Context, exchangeName, routi
 		Body:         data,
 		DeliveryMode: args.publishDeliveryMode,
 		Priority:     args.publishPriority,
+		Headers:      amqp.Table{}, // **此处初始化 Headers**
 	}
+
+	// 处理延迟消息 // **新增代码**
+	if args.delay > 0 {
+		if publishing.Headers == nil {
+			publishing.Headers = amqp.Table{}
+		}
+		publishing.Headers["x-delay"] = args.delay // **设置延迟时间**
+	}
+
 	err = channel.Publish(args.exchangeName, args.routingKey, args.publishMandatory, args.publishImmediate, publishing)
 	if err != nil {
 		return err

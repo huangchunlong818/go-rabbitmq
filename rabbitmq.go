@@ -60,6 +60,15 @@ func (r *RabbitmqInit) Direct(ctx context.Context, key string, data []byte) erro
 	return global.RabbitMq.ProducerDirect(ctx, now.Exchange, now.QueueRouterKey, data)
 }
 
+// 延迟消息生产 毫秒 5000 就是5秒
+func (r *RabbitmqInit) Delay(ctx context.Context, key string, data []byte, delay int) error {
+	now, err := r.GetRabbitmqConfigByKey(key)
+	if err != nil {
+		return err
+	}
+	return global.RabbitMq.ProducerDelay(ctx, now.Exchange, now.QueueRouterKey, data, delay)
+}
+
 // 获取rabbitmq消费配置
 func (r *RabbitmqInit) GetRabbitmqConfig(keys ...string) []config.RabbitmqConsume {
 	configs := r.config.Rabbitmq
