@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/avast/retry-go"
 	errorx "github.com/huangchunlong818/go-rabbitmq/rabbitmq/error"
+	"github.com/streadway/amqp"
 	"strconv"
 	"time"
 )
@@ -235,7 +236,13 @@ func (c *RabmqConnPool) startConsumeWithConn(ctx context.Context, connWrapper *m
 		args.queueName = queue.Name
 	}
 	// 交换机定义
-	err = channel.ExchangeDeclare(args.exchangeName, args.exchangeType, args.exchangeDurable, args.exchangeAutoDelete, args.exchangeInternal, args.exchangeNoWait, nil)
+	var argsx = make(amqp.Table)
+	if args.exchangeType == "x-delayed-message" {
+		argsx["x-delayed-type"] = "direct"
+	} else {
+		argsx = nil
+	}
+	err = channel.ExchangeDeclare(args.exchangeName, args.exchangeType, args.exchangeDurable, args.exchangeAutoDelete, args.exchangeInternal, args.exchangeNoWait, argsx)
 	if err != nil {
 		return err
 	}
